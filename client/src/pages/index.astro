@@ -34,9 +34,10 @@ import Layout from '../layouts/Layout.astro';
 			<!-- 3D Card Input Section -->
 			<div class="max-w-4xl mx-auto perspective-1000">
 				<div class="glass p-3 md:p-6 rounded-[32px] shadow-2xl relative group transition-all duration-500 hover:rotate-x-2 hover:rotate-y-2 hover:shadow-blue-500/20">
-					<form class="flex flex-col md:flex-row gap-4" onsubmit="event.preventDefault(); document.getElementById('status').classList.remove('hidden');">
+					<form id="download-form" class="flex flex-col md:flex-row gap-4">
 						<div class="flex-1 relative">
 							<input 
+								id="video-url"
 								type="url" 
 								placeholder="Paste your link here (YouTube, TikTok, Instagram...)" 
 								class="w-full bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-5 outline-none text-lg focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
@@ -62,6 +63,35 @@ import Layout from '../layouts/Layout.astro';
 							<div class="text-left">
 								<h3 class="font-bold">Analyzing Video...</h3>
 								<p class="text-sm text-slate-500">Fetching available resolutions and formats</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Error Message -->
+					<div id="error-message" class="hidden mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 font-medium">
+					</div>
+				</div>
+			</div>
+
+			<!-- Results Section -->
+			<div id="results" class="hidden mt-12 max-w-4xl mx-auto animate-in fade-in slide-in-from-top-8 duration-500">
+				<div class="glass p-6 md:p-8 rounded-[32px] shadow-xl text-left">
+					<div class="flex flex-col md:flex-row gap-8">
+						<div class="w-full md:w-1/3">
+							<img id="res-thumbnail" src="" alt="Thumbnail" class="w-full rounded-2xl shadow-lg aspect-video object-cover" />
+						</div>
+						<div class="flex-1">
+							<h2 id="res-title" class="text-2xl font-bold mb-4 line-clamp-2"></h2>
+							<div class="flex items-center gap-4 text-sm text-slate-500 mb-6">
+								<span id="res-platform" class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 font-bold uppercase"></span>
+								<span id="res-duration"></span>
+							</div>
+							
+							<div class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+								<h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Available Formats</h3>
+								<div id="res-formats" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+									<!-- Formats will be injected here -->
+								</div>
 							</div>
 						</div>
 					</div>
@@ -112,5 +142,85 @@ import Layout from '../layouts/Layout.astro';
 			background-size: 200% auto;
 			animation: gradient 4s linear infinite;
 		}
+		.custom-scrollbar::-webkit-scrollbar {
+			width: 6px;
+		}
+		.custom-scrollbar::-webkit-scrollbar-track {
+			background: transparent;
+		}
+		.custom-scrollbar::-webkit-scrollbar-thumb {
+			background: rgba(59, 130, 246, 0.2);
+			border-radius: 10px;
+		}
 	</style>
+
+	<script>
+		const form = document.getElementById('download-form') as HTMLFormElement;
+		const urlInput = document.getElementById('video-url') as HTMLInputElement;
+		const status = document.getElementById('status');
+		const results = document.getElementById('results');
+		const errorMessage = document.getElementById('error-message');
+		
+		const resThumbnail = document.getElementById('res-thumbnail') as HTMLImageElement;
+		const resTitle = document.getElementById('res-title');
+		const resPlatform = document.getElementById('res-platform');
+		const resDuration = document.getElementById('res-duration');
+		const resFormats = document.getElementById('res-formats');
+
+		const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:7860/api';
+
+		form?.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const url = urlInput?.value;
+			
+			if (!url || !status || !results || !errorMessage || !resThumbnail || !resTitle || !resPlatform || !resDuration || !resFormats) return;
+
+			// Reset state
+			status.classList.remove('hidden');
+			results.classList.add('hidden');
+			errorMessage.classList.add('hidden');
+
+			try {
+				const response = await fetch(`${API_URL}/video/info?url=${encodeURIComponent(url)}`);
+				const result = await response.json();
+
+				if (!result.success) {
+					throw new Error(result.error?.message || 'Failed to fetch video information');
+				}
+
+				const data = result.data;
+				
+				// Update UI
+				resThumbnail.src = data.thumbnailUrl;
+				resTitle.textContent = data.title;
+				resPlatform.textContent = data.platform;
+				resDuration.textContent = `${Math.floor(data.duration / 60)}m ${data.duration % 60}s`;
+				
+				// Clear formats
+				resFormats.innerHTML = '';
+				
+				data.formats.forEach((f: any) => {
+					const btn = document.createElement('a');
+					btn.href = f.url;
+					btn.target = '_blank';
+					btn.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-500 hover:text-white transition-all group/btn';
+					btn.innerHTML = `
+						<div class="flex flex-col">
+							<span class="font-bold uppercase text-xs">${f.quality}</span>
+							<span class="text-[10px] opacity-60">${f.ext.toUpperCase()} ${f.hasAudio ? '+ Audio' : '(No Audio)'}</span>
+						</div>
+						<svg class="w-4 h-4 opacity-40 group-hover/btn:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+					`;
+					resFormats.appendChild(btn);
+				});
+
+				results.classList.remove('hidden');
+			} catch (err: any) {
+				errorMessage.textContent = err.message;
+				errorMessage.classList.remove('hidden');
+			} finally {
+				status.classList.add('hidden');
+			}
+		});
+	</script>
 </Layout>

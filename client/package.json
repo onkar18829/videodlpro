@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.5.10",
-    "@astrojs/cloudflare": "^10.0.4",
     "@astrojs/tailwind": "^5.1.0",
+    "@astrojs/vercel": "^10.0.8",
     "astro": "^4.6.1",
     "framer-motion": "^11.18.2",
     "lucide-react": "^0.368.0",

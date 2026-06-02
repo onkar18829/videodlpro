@@ -1,4 +1,5 @@
 import { BaseProvider, VideoMetadata } from './BaseProvider';
+import ytdl from 'ytdl-core';
 
 export class YoutubeProvider extends BaseProvider {
   protected name = 'youtube';
@@ -9,17 +10,27 @@ export class YoutubeProvider extends BaseProvider {
   }
 
   async getMetadata(url: string): Promise<VideoMetadata> {
-    // TODO: Implement actual YouTube extraction logic (e.g., using ytdl-core or similar)
-    return {
-      id: 'demo-id',
-      title: 'Sample YouTube Video',
-      duration: 120,
-      thumbnailUrl: 'https://img.youtube.com/vi/demo-id/maxresdefault.jpg',
-      platform: 'youtube',
-      formats: [
-        { url: 'demo-url', quality: '1080p', hasAudio: true, ext: 'mp4' },
-        { url: 'demo-url-audio', quality: 'audio', hasAudio: true, ext: 'mp3' }
-      ]
-    };
+    try {
+      const info = await ytdl.getInfo(url);
+      
+      const formats = info.formats.map(f => ({
+        url: f.url,
+        quality: f.qualityLabel || (f.hasVideo ? `${f.height}p` : 'audio'),
+        hasAudio: f.hasAudio,
+        ext: f.container || 'mp4',
+        sizeEstimate: f.contentLength ? parseInt(f.contentLength) : undefined
+      }));
+
+      return {
+        id: info.videoDetails.videoId,
+        title: info.videoDetails.title,
+        duration: parseInt(info.videoDetails.lengthSeconds),
+        thumbnailUrl: info.videoDetails.thumbnails[0].url,
+        platform: 'youtube',
+        formats
+      };
+    } catch (error: any) {
+      throw new Error(`YouTube Extraction Failed: ${error.message}`);
+    }
   }
 }
