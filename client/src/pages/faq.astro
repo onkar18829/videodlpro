@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const faqs = [
+  { q: 'Is this service free to use?', a: 'Yes, our video downloader is 100% free and will always remain so.' },
+  { q: 'Do I need to install any software?', a: 'No, everything works directly in your browser on any device.' },
+  { q: 'What quality are the downloads?', a: 'We provide the highest quality available from the source, up to 4K resolution.' },
+  { q: 'Are there any limits on downloads?', a: 'None at all. You can download as many videos as you want.' },
+  { q: 'Is it safe for my device?', a: 'Absolutely. We do not store your data or serve malicious ads.' },
+];
+---
+
+<Layout title="FAQ | Frequently Asked Questions">
+	<section class="container mx-auto px-4 py-16 max-w-3xl">
+		<h1 class="text-4xl font-bold mb-6 text-center">Frequently Asked Questions</h1>
+		<p class="text-lg text-slate-600 dark:text-slate-400 mb-12 text-center">
+			Everything you need to know about our video downloading service.
+		</p>
+
+		<div class="space-y-4">
+			{faqs.map((faq) => (
+				<div class="glass p-6 rounded-2xl">
+					<h3 class="font-bold text-lg mb-2">{faq.q}</h3>
+					<p class="text-slate-600 dark:text-slate-400">{faq.a}</p>
+				</div>
+			))}
+		</div>
+	</section>
+</Layout>

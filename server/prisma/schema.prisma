@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions  Session[]
+  downloads Download[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String?
+  ipAddress String
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Download {
+  id        String   @id @default(cuid())
+  userId    String?
+  url       String
+  platform  String
+  format    String
+  quality   String
+  status    DownloadStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+enum DownloadStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Analytics {
+  id        String   @id @default(cuid())
+  date      DateTime @default(now())
+  platform  String
+  count     Int      @default(0)
+  
+  @@unique([date, platform])
+}

@@ -1,0 +1,116 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Download Videos Online For Free | VideoDL Pro">
+	<div class="relative overflow-hidden">
+		<!-- Animated Background Elements -->
+		<div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 pointer-events-none">
+			<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px] animate-pulse"></div>
+			<div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+		</div>
+
+		<section class="container mx-auto px-4 py-20 md:py-32 text-center relative">
+			<!-- Hero Badge -->
+			<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-sm font-bold mb-8 animate-bounce">
+				<span class="relative flex h-2 w-2">
+					<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+					<span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+				</span>
+				New: 4K Video Support Added
+			</div>
+
+			<h1 class="text-5xl md:text-8xl font-black tracking-tighter mb-8 leading-[1.1]">
+				Download Any Video <br class="hidden md:block"/>
+				<span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 animate-gradient">
+					In Seconds.
+				</span>
+			</h1>
+
+			<p class="text-xl md:text-2xl text-slate-600 dark:text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed">
+				The world's most advanced video downloader. Fast, free, and secure. Supports YouTube, TikTok, Instagram, and 100+ other platforms.
+			</p>
+
+			<!-- 3D Card Input Section -->
+			<div class="max-w-4xl mx-auto perspective-1000">
+				<div class="glass p-3 md:p-6 rounded-[32px] shadow-2xl relative group transition-all duration-500 hover:rotate-x-2 hover:rotate-y-2 hover:shadow-blue-500/20">
+					<form class="flex flex-col md:flex-row gap-4" onsubmit="event.preventDefault(); document.getElementById('status').classList.remove('hidden');">
+						<div class="flex-1 relative">
+							<input 
+								type="url" 
+								placeholder="Paste your link here (YouTube, TikTok, Instagram...)" 
+								class="w-full bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-5 outline-none text-lg focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+								required
+							/>
+							<div class="absolute right-4 top-1/2 -translate-y-1/2 hidden md:block">
+								<kbd class="px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded text-xs text-slate-500">⌘ + V</kbd>
+							</div>
+						</div>
+						<button 
+							type="submit" 
+							class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-10 py-5 rounded-2xl transition-all active:scale-95 shadow-lg shadow-blue-500/30 flex items-center justify-center gap-3 group"
+						>
+							<span>Download</span>
+							<svg class="w-5 h-5 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+						</button>
+					</form>
+					
+					<!-- Processing State -->
+					<div id="status" class="hidden mt-6 p-6 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-4">
+						<div class="flex items-center justify-center gap-4">
+							<div class="w-12 h-12 border-4 border-blue-500/20 border-t-blue-600 rounded-full animate-spin"></div>
+							<div class="text-left">
+								<h3 class="font-bold">Analyzing Video...</h3>
+								<p class="text-sm text-slate-500">Fetching available resolutions and formats</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Floating Platform Icons -->
+			<div class="mt-24 grid grid-cols-3 md:grid-cols-6 gap-8 opacity-40 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 duration-700">
+				<a href="/download/youtube" class="flex flex-col items-center gap-2 group cursor-pointer hover:-translate-y-2 transition-transform">
+					<div class="w-16 h-16 rounded-2xl glass flex items-center justify-center text-3xl group-hover:bg-red-500/10 transition-colors">📹</div>
+					<span class="text-xs font-bold">YouTube</span>
+				</a>
+				<a href="/download/tiktok" class="flex flex-col items-center gap-2 group cursor-pointer hover:-translate-y-2 transition-transform">
+					<div class="w-16 h-16 rounded-2xl glass flex items-center justify-center text-3xl group-hover:bg-slate-500/10 transition-colors">🎵</div>
+					<span class="text-xs font-bold">TikTok</span>
+				</a>
+				<a href="/download/instagram" class="flex flex-col items-center gap-2 group cursor-pointer hover:-translate-y-2 transition-transform">
+					<div class="w-16 h-16 rounded-2xl glass flex items-center justify-center text-3xl group-hover:bg-pink-500/10 transition-colors">📸</div>
+					<span class="text-xs font-bold">Instagram</span>
+				</a>
+				<a href="/download/facebook" class="flex flex-col items-center gap-2 group cursor-pointer hover:-translate-y-2 transition-transform">
+					<div class="w-16 h-16 rounded-2xl glass flex items-center justify-center text-3xl group-hover:bg-blue-500/10 transition-colors">👥</div>
+					<span class="text-xs font-bold">Facebook</span>
+				</a>
+				<a href="/download/twitter" class="flex flex-col items-center gap-2 group cursor-pointer hover:-translate-y-2 transition-transform">
+					<div class="w-16 h-16 rounded-2xl glass flex items-center justify-center text-3xl group-hover:bg-slate-500/10 transition-colors">🐦</div>
+					<span class="text-xs font-bold">Twitter</span>
+				</a>
+				<a href="/download/vimeo" class="flex flex-col items-center gap-2 group cursor-pointer hover:-translate-y-2 transition-transform">
+					<div class="w-16 h-16 rounded-2xl glass flex items-center justify-center text-3xl group-hover:bg-blue-400/10 transition-colors">📺</div>
+					<span class="text-xs font-bold">Vimeo</span>
+				</a>
+			</div>
+		</section>
+	</div>
+
+	<style>
+		.perspective-1000 { perspective: 1000px; }
+		.rotate-x-2:hover { transform: rotateX(2deg); }
+		.rotate-y-2:hover { transform: rotateY(2deg); }
+		
+		@keyframes gradient {
+			0% { background-position: 0% 50%; }
+			50% { background-position: 100% 50%; }
+			100% { background-position: 0% 50%; }
+		}
+		.animate-gradient {
+			background-size: 200% auto;
+			animation: gradient 4s linear infinite;
+		}
+	</style>
+</Layout>
