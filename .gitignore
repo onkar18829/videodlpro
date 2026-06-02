@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+.astro/
+package-lock.json
+.vscode/
+.DS_Store
+*.log
