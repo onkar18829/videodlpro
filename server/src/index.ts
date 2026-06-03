@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { apiLimiter } from './middlewares/rateLimiter';
 import { errorHandler } from './middlewares/errorHandler';
 import { YoutubeProvider } from './services/providers/YoutubeProvider';
+import { InstagramProvider } from './services/providers/InstagramProvider';
 
 dotenv.config();
 
@@ -14,7 +15,8 @@ const port = process.env.PORT || 7860;
 
 // Instantiate providers
 const providers = [
-  new YoutubeProvider()
+  new YoutubeProvider(),
+  new InstagramProvider()
 ];
 
 // Security Middlewares
