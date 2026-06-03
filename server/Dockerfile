@@ -10,7 +10,8 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-# Build the TypeScript code
+# Fix tsc permissions and build
+RUN chmod +x node_modules/.bin/tsc
 RUN npm run build
 
 # Expose port (Hugging Face Spaces default)
