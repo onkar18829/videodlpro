@@ -33,6 +33,7 @@ export class YoutubeProvider extends BaseProvider {
       const formats = (data.formats || []).map((f: any) => ({
         url: f.url,
         quality: f.format_note || (f.height ? `${f.height}p` : 'audio'),
+        hasVideo: !!f.vcodec && f.vcodec !== 'none',
         hasAudio: !!f.acodec && f.acodec !== 'none',
         ext: f.ext || 'mp4',
         sizeEstimate: f.filesize || undefined

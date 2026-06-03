@@ -10,6 +10,7 @@ export interface VideoMetadata {
 export interface VideoFormat {
   url: string;
   quality: string;
+  hasVideo: boolean;
   hasAudio: boolean;
   sizeEstimate?: number;
   ext: string;

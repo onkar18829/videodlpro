@@ -201,16 +201,25 @@ import Layout from '../layouts/Layout.astro';
 			formatListTitle.textContent = currentType === 'video' ? 'Select Video Quality' : 'Select Audio Quality';
 
 			const filtered = currentFormats.filter(f => {
-				const isAudioOnly = f.quality === 'audio' || (!f.quality.includes('p') && f.hasAudio);
-				const isVideoWithAudio = f.quality.includes('p') && f.hasAudio;
-				return currentType === 'video' ? isVideoWithAudio : isAudioOnly;
+				if (currentType === 'video') {
+					// Video tab: Must have BOTH video and audio
+					return f.hasVideo && f.hasAudio;
+				} else {
+					// Audio tab: Must have audio AND NO video
+					return f.hasAudio && !f.hasVideo;
+				}
 			});
 
-			// Sort by quality (higher first)
+			// Sort by quality (higher resolution/quality first)
 			filtered.sort((a, b) => {
 				const qA = parseInt(a.quality) || 0;
 				const qB = parseInt(b.quality) || 0;
-				return qB - qA;
+				
+				// If both are numbers (resolutions), sort descending
+				if (qA !== qB) return qB - qA;
+				
+				// Fallback for audio quality strings or same resolutions
+				return b.quality.localeCompare(a.quality);
 			});
 
 			filtered.forEach((f: any) => {
@@ -218,9 +227,12 @@ import Layout from '../layouts/Layout.astro';
 				btn.href = f.url;
 				btn.target = '_blank';
 				btn.className = 'flex items-center justify-between p-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white transition-all group/btn border border-transparent hover:border-blue-400 shadow-sm';
+				
+				const displayQuality = currentType === 'audio' ? 'High Quality Audio' : f.quality;
+
 				btn.innerHTML = `
 					<div class="flex flex-col text-left">
-						<span class="font-bold uppercase text-sm">${f.quality === 'audio' ? 'High Quality Audio' : f.quality}</span>
+						<span class="font-bold uppercase text-sm">${displayQuality}</span>
 						<div class="flex items-center gap-2 mt-1">
 							<span class="text-[10px] opacity-60 px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded font-bold group-hover/btn:bg-blue-500">${f.ext.toUpperCase()}</span>
 							<span class="text-[10px] opacity-60">${f.sizeEstimate ? Math.round(f.sizeEstimate / 1024 / 1024) + ' MB' : ''}</span>
