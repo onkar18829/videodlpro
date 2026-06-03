@@ -7,6 +7,10 @@ import { apiLimiter } from './middlewares/rateLimiter';
 import { errorHandler } from './middlewares/errorHandler';
 import { YoutubeProvider } from './services/providers/YoutubeProvider';
 import { InstagramProvider } from './services/providers/InstagramProvider';
+import { TikTokProvider } from './services/providers/TikTokProvider';
+import { TwitterProvider } from './services/providers/TwitterProvider';
+import { FacebookProvider } from './services/providers/FacebookProvider';
+import { VimeoProvider } from './services/providers/VimeoProvider';
 
 dotenv.config();
 
@@ -16,7 +20,11 @@ const port = process.env.PORT || 7860;
 // Instantiate providers
 const providers = [
   new YoutubeProvider(),
-  new InstagramProvider()
+  new InstagramProvider(),
+  new TikTokProvider(),
+  new TwitterProvider(),
+  new FacebookProvider(),
+  new VimeoProvider()
 ];
 
 // Security Middlewares
