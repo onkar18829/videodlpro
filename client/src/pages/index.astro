@@ -88,23 +88,27 @@ import Layout from '../layouts/Layout.astro';
 							</div>
 							
 							<div class="space-y-6">
-								<div>
-									<h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-										Video Options
-									</h3>
-									<div id="res-video-formats" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-										<!-- Video formats will be injected here -->
-									</div>
+								<div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl w-full max-w-sm mx-auto">
+									<button 
+										id="btn-video" 
+										class="flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+									>
+										Video
+									</button>
+									<button 
+										id="btn-audio" 
+										class="flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-all text-slate-500 hover:text-blue-600"
+									>
+										Audio
+									</button>
 								</div>
 
-								<div>
-									<h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-										Audio Only
+								<div id="format-list-container">
+									<h3 id="format-list-title" class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 text-center">
+										Select Video Quality
 									</h3>
-									<div id="res-audio-formats" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-										<!-- Audio formats will be injected here -->
+									<div id="res-formats" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+										<!-- Formats will be injected here -->
 									</div>
 								</div>
 							</div>
@@ -180,16 +184,82 @@ import Layout from '../layouts/Layout.astro';
 		const resTitle = document.getElementById('res-title');
 		const resPlatform = document.getElementById('res-platform');
 		const resDuration = document.getElementById('res-duration');
-		const resVideoFormats = document.getElementById('res-video-formats');
-		const resAudioFormats = document.getElementById('res-audio-formats');
+		const resFormats = document.getElementById('res-formats');
+		const formatListTitle = document.getElementById('format-list-title');
+		const btnVideo = document.getElementById('btn-video');
+		const btnAudio = document.getElementById('btn-audio');
+
+		let currentFormats: any[] = [];
+		let currentType: 'video' | 'audio' = 'video';
 
 		const API_URL = 'https://onkar18829-videodlpro.hf.space/api';
+
+		function renderFormats() {
+			if (!resFormats || !formatListTitle) return;
+			resFormats.innerHTML = '';
+			
+			formatListTitle.textContent = currentType === 'video' ? 'Select Video Quality' : 'Select Audio Quality';
+
+			const filtered = currentFormats.filter(f => {
+				const isAudioOnly = f.quality === 'audio' || (!f.quality.includes('p') && f.hasAudio);
+				const isVideoWithAudio = f.quality.includes('p') && f.hasAudio;
+				return currentType === 'video' ? isVideoWithAudio : isAudioOnly;
+			});
+
+			// Sort by quality (higher first)
+			filtered.sort((a, b) => {
+				const qA = parseInt(a.quality) || 0;
+				const qB = parseInt(b.quality) || 0;
+				return qB - qA;
+			});
+
+			filtered.forEach((f: any) => {
+				const btn = document.createElement('a');
+				btn.href = f.url;
+				btn.target = '_blank';
+				btn.className = 'flex items-center justify-between p-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white transition-all group/btn border border-transparent hover:border-blue-400 shadow-sm';
+				btn.innerHTML = `
+					<div class="flex flex-col text-left">
+						<span class="font-bold uppercase text-sm">${f.quality === 'audio' ? 'High Quality Audio' : f.quality}</span>
+						<div class="flex items-center gap-2 mt-1">
+							<span class="text-[10px] opacity-60 px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded font-bold group-hover/btn:bg-blue-500">${f.ext.toUpperCase()}</span>
+							<span class="text-[10px] opacity-60">${f.sizeEstimate ? Math.round(f.sizeEstimate / 1024 / 1024) + ' MB' : ''}</span>
+						</div>
+					</div>
+					<div class="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center group-hover/btn:bg-white/20 transition-colors">
+						<svg class="w-4 h-4 text-blue-600 group-hover/btn:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+					</div>
+				`;
+				resFormats.appendChild(btn);
+			});
+
+			if (filtered.length === 0) {
+				resFormats.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-sm italic">No ${currentType} formats available for this link.</div>`;
+			}
+		}
+
+		function setTab(type: 'video' | 'audio') {
+			currentType = type;
+			if (btnVideo && btnAudio) {
+				if (type === 'video') {
+					btnVideo.className = 'flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/20';
+					btnAudio.className = 'flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-all text-slate-500 hover:text-blue-600';
+				} else {
+					btnAudio.className = 'flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/20';
+					btnVideo.className = 'flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-all text-slate-500 hover:text-blue-600';
+				}
+			}
+			renderFormats();
+		}
+
+		btnVideo?.addEventListener('click', () => setTab('video'));
+		btnAudio?.addEventListener('click', () => setTab('audio'));
 		
 		form?.addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const url = urlInput?.value;
 			
-			if (!url || !status || !results || !errorMessage || !resThumbnail || !resTitle || !resPlatform || !resDuration || !resVideoFormats || !resAudioFormats) return;
+			if (!url || !status || !results || !errorMessage || !resThumbnail || !resTitle || !resPlatform || !resDuration || !resFormats) return;
 
 			// Reset state
 			status.classList.remove('hidden');
@@ -205,6 +275,7 @@ import Layout from '../layouts/Layout.astro';
 				}
 
 				const data = result.data;
+				currentFormats = data.formats;
 				
 				// Update UI
 				resThumbnail.src = data.thumbnailUrl;
@@ -212,44 +283,7 @@ import Layout from '../layouts/Layout.astro';
 				resPlatform.textContent = data.platform;
 				resDuration.textContent = `${Math.floor(data.duration / 60)}m ${data.duration % 60}s`;
 				
-				// Clear formats
-				resVideoFormats.innerHTML = '';
-				resAudioFormats.innerHTML = '';
-				
-				data.formats.forEach((f: any) => {
-					// Logic: 
-					// 1. If it has both video and audio -> Video Option
-					// 2. If it's just audio -> Audio Option
-					// 3. If it's just video (no audio) -> Skip (to keep it simple for users)
-					
-					const isAudioOnly = f.quality === 'audio' || (!f.quality.includes('p') && f.hasAudio);
-					const isVideoWithAudio = f.quality.includes('p') && f.hasAudio;
-
-					if (!isAudioOnly && !isVideoWithAudio) return;
-
-					const btn = document.createElement('a');
-					btn.href = f.url;
-					btn.target = '_blank';
-					btn.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-500 hover:text-white transition-all group/btn';
-					btn.innerHTML = `
-						<div class="flex flex-col text-left">
-							<span class="font-bold uppercase text-xs">${f.quality === 'audio' ? 'High Quality Audio' : f.quality}</span>
-							<span class="text-[10px] opacity-60">${f.ext.toUpperCase()} ${f.sizeEstimate ? '• ' + Math.round(f.sizeEstimate / 1024 / 1024) + 'MB' : ''}</span>
-						</div>
-						<svg class="w-4 h-4 opacity-40 group-hover/btn:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-					`;
-					
-					if (isVideoWithAudio) {
-						resVideoFormats.appendChild(btn);
-					} else {
-						resAudioFormats.appendChild(btn);
-					}
-				});
-
-				// Hide sections if empty
-				resVideoFormats.parentElement?.classList.toggle('hidden', resVideoFormats.children.length === 0);
-				resAudioFormats.parentElement?.classList.toggle('hidden', resAudioFormats.children.length === 0);
-
+				setTab('video');
 				results.classList.remove('hidden');
 			} catch (err: any) {
 				errorMessage.textContent = err.message;
