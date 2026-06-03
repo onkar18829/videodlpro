@@ -1,0 +1,31 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const platforms = [
+  { name: 'YouTube', icon: '📺', color: 'hover:text-red-500' },
+  { name: 'TikTok', icon: '🎵', color: 'hover:text-black dark:hover:text-white' },
+  { name: 'Instagram', icon: '📸', color: 'hover:text-pink-600' },
+  { name: 'Facebook', icon: '👥', color: 'hover:text-blue-600' },
+  { name: 'Twitter / X', icon: '🐦', color: 'hover:text-black dark:hover:text-white' },
+  { name: 'Vimeo', icon: '📹', color: 'hover:text-blue-400' },
+  { name: 'Dailymotion', icon: '📺', color: 'hover:text-blue-700' },
+];
+---
+
+<Layout title="Supported Platforms | Online Video Downloader">
+	<section class="container mx-auto px-4 py-16 text-center">
+		<h1 class="text-4xl font-bold mb-6">Supported Platforms</h1>
+		<p class="text-lg text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto">
+			We support downloading videos from almost all popular social media and video sharing platforms.
+		</p>
+
+		<div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+			{platforms.map((platform) => (
+				<div class={`glass p-8 rounded-2xl transition-all hover:scale-105 cursor-pointer ${platform.color}`}>
+					<div class="text-4xl mb-4">{platform.icon}</div>
+					<h3 class="font-bold text-lg">{platform.name}</h3>
+				</div>
+			))}
+		</div>
+	</section>
+</Layout>

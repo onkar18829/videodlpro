@@ -1,0 +1,58 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+---
+
+<Layout title="Blog | VideoDL Pro Insights">
+	<div class="container mx-auto px-4 py-16 relative">
+		<!-- Background Glow -->
+		<div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 blur-[100px] -z-10"></div>
+
+		<div class="text-center mb-20">
+			<h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight">
+				Insights & <span class="text-blue-600">Tutorials</span>
+			</h1>
+			<p class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+				Stay updated with the latest social media trends, video downloading tips, and platform updates.
+			</p>
+		</div>
+
+		<div class="grid md:grid-cols-3 gap-10 max-w-7xl mx-auto">
+			{posts.map((post) => (
+				<a href={`/blog/${post.slug}`} class="group">
+					<article class="glass rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/10">
+						<div class="h-56 overflow-hidden relative">
+							<img 
+								src={post.data.heroImage || 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop'} 
+								alt={post.data.title}
+								class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+							/>
+							<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+								<span class="text-white font-bold flex items-center gap-2">
+									Read Article <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+								</span>
+							</div>
+						</div>
+						<div class="p-8">
+							<span class="px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 text-xs font-bold uppercase tracking-widest">
+								{post.data.category}
+							</span>
+							<h2 class="text-2xl font-bold mt-4 mb-4 leading-tight group-hover:text-blue-600 transition-colors">
+								{post.data.title}
+							</h2>
+							<p class="text-slate-500 text-sm line-clamp-2">
+								{post.data.description}
+							</p>
+							<div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-400">
+								<span>{post.data.pubDate.toLocaleDateString()}</span>
+								<span>5 min read</span>
+							</div>
+						</div>
+					</article>
+				</a>
+			))}
+		</div>
+	</div>
+</Layout>

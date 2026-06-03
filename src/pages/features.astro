@@ -1,0 +1,31 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const features = [
+  { title: 'HD Downloads', desc: 'Download videos in 1080p, 2K, and 4K quality.', icon: '✨' },
+  { title: 'MP3 Extraction', desc: 'Convert any video to high-quality MP3 audio.', icon: '🎵' },
+  { title: 'No Limits', desc: 'Unlimited downloads with no speed restrictions.', icon: '⚡' },
+  { title: 'Fast & Free', desc: '100% free to use with lightning-fast processing.', icon: '🚀' },
+  { title: 'Secure', desc: 'Privacy-focused downloading with no tracking.', icon: '🛡️' },
+  { title: 'Multi-device', desc: 'Works perfectly on Mobile, Tablet, and Desktop.', icon: '📱' },
+];
+---
+
+<Layout title="Features | Video Downloader Pro">
+	<section class="container mx-auto px-4 py-16 text-center">
+		<h1 class="text-4xl font-bold mb-6">Premium Features</h1>
+		<p class="text-lg text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto">
+			Experience the most advanced online video downloading tools available for free.
+		</p>
+
+		<div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+			{features.map((f) => (
+				<div class="glass p-8 rounded-2xl text-left border-b-4 border-b-blue-500">
+					<div class="text-3xl mb-4">{f.icon}</div>
+					<h3 class="font-bold text-xl mb-2">{f.title}</h3>
+					<p class="text-slate-600 dark:text-slate-400">{f.desc}</p>
+				</div>
+			))}
+		</div>
+	</section>
+</Layout>

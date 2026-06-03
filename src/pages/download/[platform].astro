@@ -1,0 +1,79 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const { platform } = Astro.params;
+
+const platformData: Record<string, { name: string; color: string; icon: string; bg: string }> = {
+  youtube: { name: 'YouTube', color: 'text-red-600', icon: '📹', bg: 'bg-red-500/10' },
+  tiktok: { name: 'TikTok', color: 'text-black dark:text-white', icon: '🎵', bg: 'bg-slate-500/10' },
+  instagram: { name: 'Instagram', color: 'text-pink-600', icon: '📸', bg: 'bg-pink-500/10' },
+  facebook: { name: 'Facebook', color: 'text-blue-600', icon: '👥', bg: 'bg-blue-500/10' },
+  twitter: { name: 'Twitter (X)', color: 'text-slate-900 dark:text-white', icon: '🐦', bg: 'bg-slate-500/10' },
+  vimeo: { name: 'Vimeo', color: 'text-blue-400', icon: '📺', bg: 'bg-blue-400/10' },
+};
+
+const data = platform ? platformData[platform] : null;
+
+if (!data) {
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title={`Download ${data.name} Videos Online | VideoDL Pro`}>
+	<div class="relative overflow-hidden">
+		<div class={`absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 pointer-events-none ${data.bg} blur-[120px]`}></div>
+
+		<section class="container mx-auto px-4 py-20 text-center">
+			<div class={`inline-flex items-center gap-3 px-6 py-3 rounded-2xl ${data.bg} border border-current mb-8`}>
+				<span class="text-3xl">{data.icon}</span>
+				<span class={`text-xl font-black ${data.color}`}>{data.name} Downloader</span>
+			</div>
+
+			<h1 class="text-4xl md:text-7xl font-black tracking-tighter mb-8">
+				Save <span class={data.color}>{data.name}</span> Videos <br/> 
+                High Quality & Fast
+			</h1>
+
+			<p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto">
+				Paste your {data.name} link below to download videos in MP4 or MP3 format instantly. No software required.
+			</p>
+
+			<div class="max-w-4xl mx-auto perspective-1000">
+				<div class="glass p-3 md:p-6 rounded-[32px] shadow-2xl relative group">
+					<form class="flex flex-col md:flex-row gap-4" onsubmit="event.preventDefault(); document.getElementById('status').classList.remove('hidden');">
+						<input 
+							type="url" 
+							placeholder={`Paste ${data.name} link here...`} 
+							class="flex-1 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-5 outline-none text-lg focus:ring-4 focus:ring-blue-500/20"
+							required
+						/>
+						<button class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-10 py-5 rounded-2xl transition-all shadow-lg">
+							Download
+						</button>
+					</form>
+					<div id="status" class="hidden mt-6 p-6 border-t border-slate-100 dark:border-slate-800">
+						<div class="flex items-center justify-center gap-4">
+							<div class="w-10 h-10 border-4 border-blue-500/20 border-t-blue-600 rounded-full animate-spin"></div>
+							<p class="font-bold">Analyzing {data.name} Link...</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+            <div class="mt-20 grid md:grid-cols-3 gap-8 text-left max-w-5xl mx-auto">
+                <div class="glass p-8 rounded-3xl">
+                    <h3 class="font-bold text-xl mb-4">No Watermark</h3>
+                    <p class="text-slate-500 text-sm">Download {data.name} videos in their original quality without any annoying watermarks or logos.</p>
+                </div>
+                <div class="glass p-8 rounded-3xl">
+                    <h3 class="font-bold text-xl mb-4">MP3 & MP4</h3>
+                    <p class="text-slate-500 text-sm">Convert {data.name} content to high-quality audio or save the full video in various resolutions.</p>
+                </div>
+                <div class="glass p-8 rounded-3xl">
+                    <h3 class="font-bold text-xl mb-4">Safe & Secure</h3>
+                    <p class="text-slate-500 text-sm">Our platform uses end-to-end encryption to ensure your downloads remain private and safe.</p>
+                </div>
+            </div>
+		</section>
+	</div>
+</Layout>
