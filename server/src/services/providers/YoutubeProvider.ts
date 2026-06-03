@@ -1,5 +1,7 @@
 import { BaseProvider, VideoMetadata } from './BaseProvider';
-import ytdl from 'ytdl-core';
+import YTDlpWrap from 'yt-dlp-wrap';
+
+const ytDlp = new YTDlpWrap('/usr/local/bin/yt-dlp');
 
 export class YoutubeProvider extends BaseProvider {
   protected name = 'youtube';
@@ -11,21 +13,21 @@ export class YoutubeProvider extends BaseProvider {
 
   async getMetadata(url: string): Promise<VideoMetadata> {
     try {
-      const info = await ytdl.getInfo(url);
-      
-      const formats = info.formats.map(f => ({
+      const info = await ytDlp.getVideoInfo(url);
+
+      const formats = (info.formats || []).map((f: any) => ({
         url: f.url,
-        quality: f.qualityLabel || (f.hasVideo ? `${f.height}p` : 'audio'),
-        hasAudio: f.hasAudio,
-        ext: f.container || 'mp4',
-        sizeEstimate: f.contentLength ? parseInt(f.contentLength) : undefined
+        quality: f.format_note || f.height ? `${f.height}p` : 'audio',
+        hasAudio: !!f.acodec && f.acodec !== 'none',
+        ext: f.ext || 'mp4',
+        sizeEstimate: f.filesize || undefined
       }));
 
       return {
-        id: info.videoDetails.videoId,
-        title: info.videoDetails.title,
-        duration: parseInt(info.videoDetails.lengthSeconds),
-        thumbnailUrl: info.videoDetails.thumbnails[0].url,
+        id: info.id,
+        title: info.title,
+        duration: info.duration || 0,
+        thumbnailUrl: info.thumbnail,
         platform: 'youtube',
         formats
       };
