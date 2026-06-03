@@ -1,11 +1,101 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="VideoDL Pro - Free Video Downloader">
+  <main class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white flex flex-col items-center justify-center px-4 py-20">
+    <h1 class="text-5xl font-black mb-4 text-center">Video<span class="text-blue-400">DL</span> Pro</h1>
+    <p class="text-slate-400 text-lg mb-10 text-center">Download YouTube videos in any quality. Free & fast.</p>
+
+    <div class="w-full max-w-2xl bg-slate-800 rounded-2xl p-6 shadow-xl">
+      <div class="flex gap-3">
+        <input
+          id="urlInput"
+          type="url"
+          placeholder="Paste YouTube URL here..."
+          class="flex-1 bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          id="fetchBtn"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl transition-all"
+        >
+          Get Video
+        </button>
+      </div>
+
+      <div id="error" class="hidden mt-4 text-red-400 text-sm"></div>
+      <div id="loading" class="hidden mt-6 text-center text-slate-400">Fetching video info...</div>
+
+      <div id="result" class="hidden mt-6">
+        <div class="flex gap-4 mb-4">
+          <img id="thumbnail" src="" alt="thumbnail" class="w-32 h-20 object-cover rounded-lg" />
+          <div>
+            <h2 id="title" class="font-bold text-lg"></h2>
+            <p id="duration" class="text-slate-400 text-sm mt-1"></p>
+          </div>
+        </div>
+        <h3 class="text-sm font-semibold text-slate-400 mb-2">Select format to download:</h3>
+        <div id="formats" class="flex flex-wrap gap-2"></div>
+      </div>
+    </div>
+  </main>
 </Layout>
+
+<script>
+  const apiUrl = 'https://onkar18829-videodlpro.hf.space/api';
+
+  document.getElementById('fetchBtn')?.addEventListener('click', async () => {
+    const url = (document.getElementById('urlInput') as HTMLInputElement).value.trim();
+    const error = document.getElementById('error')!;
+    const loading = document.getElementById('loading')!;
+    const result = document.getElementById('result')!;
+
+    error.classList.add('hidden');
+    result.classList.add('hidden');
+
+    if (!url) {
+      error.textContent = 'Please enter a URL.';
+      error.classList.remove('hidden');
+      return;
+    }
+
+    loading.classList.remove('hidden');
+
+    try {
+      const res = await fetch(`${apiUrl}/video/info?url=${encodeURIComponent(url)}`);
+      const data = await res.json();
+
+      if (!data.success) throw new Error(data.error?.message || 'Failed to fetch video');
+
+      const video = data.data;
+      (document.getElementById('thumbnail') as HTMLImageElement).src = video.thumbnailUrl;
+      document.getElementById('title')!.textContent = video.title;
+      document.getElementById('duration')!.textContent = `Duration: ${Math.floor(video.duration / 60)}:${String(video.duration % 60).padStart(2, '0')}`;
+
+      const formats = document.getElementById('formats')!;
+      formats.innerHTML = '';
+
+      const seen = new Set();
+      video.formats
+        .filter((f: any) => f.url && f.hasAudio && f.ext !== 'mhtml')
+        .forEach((f: any) => {
+          const label = `${f.quality} ${f.ext}`;
+          if (seen.has(label)) return;
+          seen.add(label);
+          const btn = document.createElement('a');
+          btn.href = f.url;
+          btn.target = '_blank';
+          btn.textContent = label;
+          btn.className = 'bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-all';
+          formats.appendChild(btn);
+        });
+
+      result.classList.remove('hidden');
+    } catch (e: any) {
+      error.textContent = e.message;
+      error.classList.remove('hidden');
+    } finally {
+      loading.classList.add('hidden');
+    }
+  });
+</script>
