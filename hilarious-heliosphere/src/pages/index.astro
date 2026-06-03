@@ -5,14 +5,14 @@ import Layout from '../layouts/Layout.astro';
 <Layout title="VideoDL Pro - Free Video Downloader">
   <main class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white flex flex-col items-center justify-center px-4 py-20">
     <h1 class="text-5xl font-black mb-4 text-center">Video<span class="text-blue-400">DL</span> Pro</h1>
-    <p class="text-slate-400 text-lg mb-10 text-center">Download YouTube videos in any quality. Free & fast.</p>
+    <p class="text-slate-400 text-lg mb-10 text-center">Download videos from YouTube, TikTok, Instagram & more.</p>
 
     <div class="w-full max-w-2xl bg-slate-800 rounded-2xl p-6 shadow-xl">
       <div class="flex gap-3">
         <input
           id="urlInput"
           type="url"
-          placeholder="Paste YouTube URL here..."
+          placeholder="Paste video URL here..."
           class="flex-1 bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
@@ -27,15 +27,23 @@ import Layout from '../layouts/Layout.astro';
       <div id="loading" class="hidden mt-6 text-center text-slate-400">Fetching video info...</div>
 
       <div id="result" class="hidden mt-6">
-        <div class="flex gap-4 mb-4">
-          <img id="thumbnail" src="" alt="thumbnail" class="w-32 h-20 object-cover rounded-lg" />
+        <div class="flex gap-4 mb-6">
+          <img id="thumbnail" src="" alt="thumbnail" class="w-36 h-24 object-cover rounded-xl" />
           <div>
-            <h2 id="title" class="font-bold text-lg"></h2>
+            <h2 id="title" class="font-bold text-lg leading-tight"></h2>
             <p id="duration" class="text-slate-400 text-sm mt-1"></p>
           </div>
         </div>
-        <h3 class="text-sm font-semibold text-slate-400 mb-2">Select format to download:</h3>
-        <div id="formats" class="flex flex-wrap gap-2"></div>
+
+        <div class="mb-4">
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">🎬 Video (with Audio)</h3>
+          <div id="video-btns" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">🎵 Audio Only</h3>
+          <div id="audio-btns" class="flex flex-wrap gap-2"></div>
+        </div>
       </div>
     </div>
   </main>
@@ -72,23 +80,49 @@ import Layout from '../layouts/Layout.astro';
       document.getElementById('title')!.textContent = video.title;
       document.getElementById('duration')!.textContent = `Duration: ${Math.floor(video.duration / 60)}:${String(video.duration % 60).padStart(2, '0')}`;
 
-      const formats = document.getElementById('formats')!;
-      formats.innerHTML = '';
+      const videoBtns = document.getElementById('video-btns')!;
+      const audioBtns = document.getElementById('audio-btns')!;
+      videoBtns.innerHTML = '';
+      audioBtns.innerHTML = '';
 
-      const seen = new Set();
+      const seenVideo = new Set();
+      const seenAudio = new Set();
+
+      // Video buttons (has audio + video)
       video.formats
-        .filter((f: any) => f.url && f.hasAudio && f.ext !== 'mhtml')
+        .filter((f: any) => f.url && f.hasAudio && f.ext === 'mp4' && f.ext !== 'mhtml' && f.quality !== 'storyboard')
         .forEach((f: any) => {
-          const label = `${f.quality} ${f.ext}`;
-          if (seen.has(label)) return;
-          seen.add(label);
+          if (seenVideo.has(f.quality)) return;
+          seenVideo.add(f.quality);
           const btn = document.createElement('a');
           btn.href = f.url;
           btn.target = '_blank';
-          btn.textContent = label;
-          btn.className = 'bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-all';
-          formats.appendChild(btn);
+          btn.className = 'px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all';
+          btn.textContent = `📥 ${f.quality} MP4`;
+          videoBtns.appendChild(btn);
         });
+
+      // Audio only buttons
+      video.formats
+        .filter((f: any) => f.url && f.hasAudio && (f.ext === 'm4a' || f.ext === 'webm') && !f.quality.includes('p'))
+        .forEach((f: any) => {
+          const label = f.ext.toUpperCase();
+          if (seenAudio.has(label)) return;
+          seenAudio.add(label);
+          const btn = document.createElement('a');
+          btn.href = f.url;
+          btn.target = '_blank';
+          btn.className = 'px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-xl transition-all';
+          btn.textContent = `🎵 ${f.quality || 'Best'} ${label}`;
+          audioBtns.appendChild(btn);
+        });
+
+      if (videoBtns.children.length === 0) {
+        videoBtns.innerHTML = '<p class="text-slate-500 text-sm">No video formats available</p>';
+      }
+      if (audioBtns.children.length === 0) {
+        audioBtns.innerHTML = '<p class="text-slate-500 text-sm">No audio formats available</p>';
+      }
 
       result.classList.remove('hidden');
     } catch (e: any) {

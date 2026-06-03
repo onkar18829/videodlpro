@@ -13,21 +13,31 @@ export class YoutubeProvider extends BaseProvider {
 
   async getMetadata(url: string): Promise<VideoMetadata> {
     try {
-      const info = await ytDlp.getVideoInfo(url);
+      const info = await ytDlp.execPromise([
+        url,
+        '--dump-json',
+        '--no-check-certificate',
+        '--no-playlist',
+        '--extractor-args', 'youtube:player_client=android',
+        '--legacy-server-connect',
+        '-f', 'b'
+      ]);
 
-      const formats = (info.formats || []).map((f: any) => ({
+      const data = JSON.parse(info);
+
+      const formats = (data.formats || []).map((f: any) => ({
         url: f.url,
-        quality: f.format_note || f.height ? `${f.height}p` : 'audio',
+        quality: f.format_note || (f.height ? `${f.height}p` : 'audio'),
         hasAudio: !!f.acodec && f.acodec !== 'none',
         ext: f.ext || 'mp4',
         sizeEstimate: f.filesize || undefined
       }));
 
       return {
-        id: info.id,
-        title: info.title,
-        duration: info.duration || 0,
-        thumbnailUrl: info.thumbnail,
+        id: data.id,
+        title: data.title,
+        duration: data.duration || 0,
+        thumbnailUrl: data.thumbnail,
         platform: 'youtube',
         formats
       };
