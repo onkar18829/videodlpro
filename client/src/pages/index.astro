@@ -279,6 +279,9 @@ import Layout from '../layouts/Layout.astro';
 				
 				// Update UI
 				resThumbnail.src = data.thumbnailUrl;
+				resThumbnail.onerror = () => {
+					resThumbnail.src = 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&q=80'; // Professional video placeholder
+				};
 				resTitle.textContent = data.title;
 				resPlatform.textContent = data.platform;
 				resDuration.textContent = `${Math.floor(data.duration / 60)}m ${data.duration % 60}s`;

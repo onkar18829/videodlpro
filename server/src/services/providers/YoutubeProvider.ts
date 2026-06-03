@@ -25,6 +25,11 @@ export class YoutubeProvider extends BaseProvider {
 
       const data = JSON.parse(info);
 
+      // Get the best thumbnail from the array or fallback to top-level property
+      const thumbnailUrl = (data.thumbnails && data.thumbnails.length > 0) 
+        ? data.thumbnails[data.thumbnails.length - 1].url 
+        : data.thumbnail;
+
       const formats = (data.formats || []).map((f: any) => ({
         url: f.url,
         quality: f.format_note || (f.height ? `${f.height}p` : 'audio'),
@@ -37,7 +42,7 @@ export class YoutubeProvider extends BaseProvider {
         id: data.id,
         title: data.title,
         duration: data.duration || 0,
-        thumbnailUrl: data.thumbnail,
+        thumbnailUrl,
         platform: 'youtube',
         formats
       };
